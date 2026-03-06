@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Music App — Apple UI Edition</title>
+<title>Premium Music App — Music UI Edition</title>
 
 <style>
 /* --- Premium Design System --- */
@@ -16,6 +16,7 @@
   --accent: #fa243c; 
   --border: rgba(255, 255, 255, 0.1);
   --hover-bg: rgba(255, 255, 255, 0.08);
+  --dynamic-color: #1c1c1e; /* Used for color extraction */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,7 +24,7 @@
 body { 
   background-color: var(--bg); color: var(--text-main); overflow: hidden; 
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased; user-select: none;
 }
 
 /* --- App Layout --- */
@@ -42,7 +43,7 @@ body {
 .sidebar .search-box {
   background: rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 10px;
   display: flex; align-items: center; gap: 8px; margin-bottom: 24px; cursor: text;
-  transition: background 0.3s;
+  transition: background 0.3s; position: relative; z-index: 200;
 }
 .search-box:hover { background: rgba(255,255,255,0.15); }
 .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; font-size: 13px; }
@@ -60,7 +61,7 @@ body {
 .sidebar li a.active { background-color: rgba(250, 36, 60, 0.15); color: var(--accent); }
 .sidebar li a.active svg { opacity: 1; }
 
-/* Smooth Apple Nav Selection Indicator */
+/* Smooth Music Nav Selection Indicator */
 .sidebar li a::before {
   content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 3px;
   background: var(--accent); border-radius: 4px;
@@ -68,15 +69,17 @@ body {
 }
 .sidebar li a.active::before { transform: scaleY(1); }
 
-.nav-section-title { font-size: 11px; color: var(--text-muted); font-weight: 600; padding-left: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+.nav-section-title { font-size: 11px; color: var(--text-muted); font-weight: 600; padding-left: 12px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;}
+.create-playlist-btn { font-size: 16px; cursor: pointer; transition: 0.2s; }
+.create-playlist-btn:hover { color: white; transform: scale(1.2); }
 
 /* --- Main Content Area --- */
-.main-content { grid-area: main; padding: 0; overflow-y: auto; background: #000000; scroll-behavior: smooth; }
+.main-content { grid-area: main; padding: 0; overflow-y: auto; background: #000000; scroll-behavior: smooth; position: relative;}
 .main-content::-webkit-scrollbar { width: 12px; }
 .main-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; border: 3px solid #000; }
 .content-inner { padding: 40px 40px 120px 40px; }
 
-/* Sticky Apple Header */
+/* Sticky Music Header */
 .top-bar { 
   display: flex; justify-content: space-between; align-items: center; 
   margin-bottom: 30px; position: sticky; top: 0; 
@@ -88,11 +91,25 @@ body {
 .profile-pic { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #a18cd1, #fbc2eb); cursor: pointer; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 .profile-pic:hover { transform: scale(1.1); box-shadow: 0 0 15px rgba(161, 140, 209, 0.6); }
 
-/* --- Apple Style Cards & Floating Animations --- */
-.page-view { display: none; animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-.page-view.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+/* --- Smooth Page Transition Enhancements --- */
+.page-view { 
+  display: none; 
+  opacity: 0; 
+  transform: translateY(12px);
+  transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+}
+.page-view.active { 
+  display: block; 
+  opacity: 1;
+  transform: translateY(0);
+  animation: pageSlideFade 0.35s cubic-bezier(.2,.8,.2,1) forwards; 
+}
+@keyframes pageSlideFade { 
+  from { opacity: 0; transform: translateY(12px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
 
+/* --- Music Style Cards & Floating Animations --- */
 .music-section { margin-bottom: 48px; }
 .section-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;}
 .section-title span { font-size: 13px; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: color 0.2s; }
@@ -105,7 +122,7 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; overflow: hidden; background-size: cover !important; background-position: center !important;
 }
-/* Enhanced Apple Float Effect */
+/* Enhanced Float Effect */
 .card:hover .art { 
   transform: scale(1.04) translateY(-4px); 
   box-shadow: 0 15px 30px rgba(0,0,0,0.5); 
@@ -127,6 +144,7 @@ body {
 .detail-header-container {
   position: relative; padding: 60px 40px 40px 40px; margin-top: -40px;
   border-bottom: 1px solid var(--border); overflow: hidden; display: flex; gap: 30px; align-items: flex-end;
+  background: linear-gradient(to bottom, var(--dynamic-color), #000000);
 }
 .detail-bg-blur {
   position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
@@ -150,25 +168,34 @@ body {
 .shuffle-btn:active { transform: scale(0.96); }
 
 .tracklist-container { padding: 20px 40px; }
-.track-row { display: flex; align-items: center; padding: 12px 16px; border-radius: 8px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.2s; }
+.track-row { display: flex; align-items: center; padding: 10px 16px; border-radius: 6px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .track-row:hover { background: var(--hover-bg); }
-.track-row:active { transform: scale(0.99); }
 .track-num { width: 40px; color: var(--text-muted); font-size: 13px; }
-.track-info-list { flex: 1; display: flex; flex-direction: column; gap: 4px;}
+.track-info-list { flex: 1; display: flex; flex-direction: column; gap: 2px;}
 .track-title-list { font-size: 14px; font-weight: 500; }
 .track-artist-list { font-size: 12px; color: var(--text-muted); }
 .track-duration { color: var(--text-muted); font-size: 13px; }
 
-/* --- Apple Bottom Player Bar --- */
+/* --- Context Menu --- */
+.context-menu {
+  position: absolute; background: rgba(30, 30, 32, 0.95); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; display: none; min-width: 180px;
+}
+.context-menu.show { display: block; animation: fadeIn 0.1s; }
+.context-item { padding: 8px 12px; font-size: 13px; border-radius: 6px; cursor: pointer; transition: 0.2s;}
+.context-item:hover { background: var(--accent); }
+
+/* --- Music Bottom Player Bar --- */
 .player-bar { 
   grid-area: player; background-color: var(--player-bg); border-top: 1px solid var(--border); 
   display: flex; justify-content: space-between; align-items: center; padding: 0 24px; 
-  backdrop-filter: blur(50px) saturate(180%); -webkit-backdrop-filter: blur(50px) saturate(180%); z-index: 10; 
+  backdrop-filter: blur(50px) saturate(180%); -webkit-backdrop-filter: blur(50px) saturate(180%); z-index: 90; 
   cursor: pointer; transition: background 0.3s;
 }
 .player-bar:hover { background-color: rgba(40, 40, 42, 0.95); }
 
-.now-playing { display: flex; align-items: center; gap: 12px; width: 30%; }
+.now-playing { display: flex; align-items: center; gap: 12px; width: 30%; pointer-events: none; }
 .mini-art { width: 44px; height: 44px; border-radius: 4px; background: #333; transition: background 0.3s; background-size: cover !important; background-position: center !important;}
 .track-info .title { font-size: 13px; margin-bottom: 0; font-weight: 600;}
 .track-info .subtitle { font-size: 12px; }
@@ -177,21 +204,20 @@ body {
 .player-controls { display: flex; align-items: center; gap: 30px; margin-bottom: 8px; cursor: default; }
 .control-btn { background: none; border: none; color: var(--text-main); font-size: 18px; cursor: pointer; opacity: 0.8; transition: opacity 0.2s, transform 0.2s;}
 .control-btn:hover { opacity: 1; transform: scale(1.1); }
-.control-btn:active { transform: scale(0.9); }
 .play-btn { font-size: 32px; opacity: 1; }
 
 .progress-wrapper { display: flex; align-items: center; gap: 10px; width: 100%; cursor: default; }
 .progress-wrapper span { font-size: 11px; color: var(--text-muted); min-width: 30px; text-align: center; }
-.progress-container { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; position: relative; transition: height 0.2s; }
+.progress-container { flex: 1; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; position: relative; transition: height 0.2s; }
 .progress-container:hover { height: 6px; }
 .progress-fill { height: 100%; background: #fff; border-radius: 2px; width: 0%; pointer-events: none; position: relative; transition: width 0.1s linear;}
-.progress-fill::after { content: ''; position: absolute; right: -4px; top: -3px; width: 10px; height: 10px; background: #fff; border-radius: 50%; opacity: 0; transition: opacity 0.2s; box-shadow: 0 0 5px rgba(0,0,0,0.5);}
+.progress-fill::after { content: ''; position: absolute; right: -4px; top: -3px; width: 9px; height: 9px; background: #fff; border-radius: 50%; opacity: 0; transition: opacity 0.2s; box-shadow: 0 0 5px rgba(0,0,0,0.5);}
 .progress-container:hover .progress-fill::after { opacity: 1; }
 
 .volume-control { display: flex; align-items: center; gap: 8px; width: 30%; justify-content: flex-end; color: var(--text-muted); cursor: default; }
-.vol-slider { width: 100px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; transition: height 0.2s; }
+.vol-slider { width: 100px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; cursor: pointer; position: relative; transition: height 0.2s;}
 .vol-slider:hover { height: 6px; }
-.vol-fill { height: 100%; background: #fff; border-radius: 2px; width: 50%; }
+.vol-fill { height: 100%; background: #fff; border-radius: 2px; width: 50%; pointer-events: none;}
 
 .back-nav { display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 20px; transition: opacity 0.2s; }
 .back-nav:hover { opacity: 0.8; text-decoration: underline; }
@@ -241,6 +267,36 @@ body {
 .login-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: scale(1.05); }
 .hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
+/* --- UP NEXT QUEUE PANEL --- */
+.queue-panel {
+  position: fixed; top: 0; right: 0; width: 340px; height: calc(100vh - 88px);
+  background: rgba(30, 30, 32, 0.95); backdrop-filter: blur(50px) saturate(200%);
+  border-left: 1px solid var(--border); z-index: 80; padding: 24px;
+  transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: flex; flex-direction: column;
+}
+.queue-panel.open { transform: translateX(0); }
+.queue-header { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+.queue-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.queue-list::-webkit-scrollbar { width: 6px; }
+.queue-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+.queue-item { display: flex; align-items: center; gap: 12px; padding: 8px; border-radius: 8px; transition: all 0.2s; cursor: pointer;}
+.queue-item:hover { background: rgba(255,255,255,0.1); transform: translateX(-4px); }
+.queue-item.active { background: rgba(250, 36, 60, 0.2); }
+.queue-item-art { width: 40px; height: 40px; border-radius: 4px; background-size: cover !important;}
+.queue-item-info { flex: 1; overflow: hidden; }
+.queue-item-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.queue-item-artist { font-size: 11px; color: var(--text-muted); }
+
+/* --- SEARCH RESULTS OVERLAY --- */
+.search-overlay {
+  position: absolute; top: 70px; left: 40px; right: 40px; bottom: 40px;
+  background: rgba(28, 28, 30, 0.95); backdrop-filter: blur(40px); border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1); z-index: 100; padding: 30px; overflow-y: auto;
+  display: none; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+.search-overlay.active { display: block; animation: pageSlideFade 0.3s forwards; }
+
 /* ==========================================
    UPGRADED FULL PLAYER & LYRICS UI
    ========================================== */
@@ -248,13 +304,13 @@ body {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center;
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s;
+  background: var(--dynamic-color);
 }
 .full-player-overlay.hidden { transform: translateY(100%); opacity: 0; pointer-events: none; }
 
 .full-player-bg {
   position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-  background: #1c1c1e; filter: blur(120px) saturate(200%); z-index: -1;
-  transition: background 0.8s ease; opacity: 0.8;
+  filter: blur(140px) saturate(200%); z-index: -1; opacity: 0.6; transition: background 0.8s ease;
 }
 
 .close-player-btn {
@@ -263,15 +319,35 @@ body {
 }
 .close-player-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
 
-/* Wrap existing player contents to add lyrics panel */
 .full-player-content {
   display: flex; gap: 60px; width: 90%; max-width: 1400px; height: 80%;
   align-items: center; justify-content: center;
 }
 .player-left-panel { flex: 1; max-width: 500px; display: flex; flex-direction: column; gap: 40px; }
 
-.full-art-container { width: 100%; aspect-ratio: 1/1; box-shadow: 0 30px 60px rgba(0,0,0,0.6); border-radius: 20px; overflow: hidden; transition: box-shadow 0.5s;}
-.full-art { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 100px; color: white; background-size: cover !important; background-position: center !important;}
+/* Rotating / Floating Artwork Animations */
+.full-art-container { 
+  width: 100%; aspect-ratio: 1/1; box-shadow: 0 30px 60px rgba(0,0,0,0.6); 
+  border-radius: 20px; overflow: hidden; transition: box-shadow 0.5s;
+  animation: floatAlbum 6s ease-in-out infinite;
+}
+@keyframes floatAlbum{
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.full-art { 
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; 
+  font-size: 100px; color: white; background-size: cover !important; background-position: center !important;
+  border-radius: 50% !important; /* Circular for rotation effect */
+  animation: rotateAlbum 25s linear infinite;
+}
+@keyframes rotateAlbum{
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .full-info-container { text-align: left; }
 .full-info-container h2 { font-size: 32px; font-weight: 700; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 2px 10px rgba(0,0,0,0.3);}
 .full-info-container p { font-size: 20px; color: rgba(255,255,255,0.7); }
@@ -280,7 +356,7 @@ body {
 .time-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500;}
 .full-controls { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
 
-/* NEW: The Lyrics Panel */
+/* The Lyrics Panel */
 .player-right-panel {
   flex: 1; height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; padding: 40px 20px;
   mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
@@ -328,7 +404,7 @@ body {
         <div class="profile-pic-large"></div>
         <div class="account-info">
           <h3>Monish</h3>
-          <p>Music Premium Individual</p>
+          <p>Premium Music Individual</p>
         </div>
       </div>
       <div class="settings-list">
@@ -347,7 +423,7 @@ body {
     <aside class="sidebar">
       <div class="search-box">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="#ebebf599"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" placeholder="Search">
+        <input type="text" id="master-search" placeholder="Search">
       </div>
 
       <nav>
@@ -378,6 +454,25 @@ body {
           <li><a class="nav-link" onclick="switchPage('genres', this)">
             <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z"/></svg> Genres
           </a></li>
+          <li><a class="nav-link" onclick="switchPage('songs', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg> Songs
+          </a></li>
+          <li><a class="nav-link" onclick="switchPage('music-videos', this)">
+            <svg viewBox="0 0 24 24"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg> Music Videos
+          </a></li>
+          <li><a class="nav-link" onclick="switchPage('downloaded', this)">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Downloaded
+          </a></li>
+          <li><a class="nav-link" onclick="switchPage('recently-added', this)">
+            <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg> Recently Added
+          </a></li>
+        </ul>
+      </nav>
+      <div class="nav-section-title">Playlists <span class="create-playlist-btn" onclick="createPlaylist()">+</span></div>
+      <nav>
+        <ul id="sidebar-playlists">
+          <li><a class="nav-link" onclick="openAlbum('Gym Pump', 'Playlist', 'linear-gradient(45deg, #ff9a9e, #fecfef)', '')"><svg viewBox="0 0 24 24"><path d="M4 10h12v2H4zm0-4h16v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg> Gym Pump</a></li>
+          <li><a class="nav-link" onclick="openAlbum('Late Night', 'Playlist', 'linear-gradient(45deg, #434343, #000000)', '')"><svg viewBox="0 0 24 24"><path d="M4 10h12v2H4zm0-4h16v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg> Late Night</a></li>
         </ul>
       </nav>
     </aside>
@@ -390,13 +485,18 @@ body {
 
       <div class="content-inner">
         
+        <div class="search-overlay" id="search-results-overlay">
+          <h2 class="section-title">Top Results</h2>
+          <div class="tracklist-container" id="search-results-list" style="padding: 0;"></div>
+        </div>
+
         <div id="home" class="page-view active">
           
           <section class="music-section">
             <h2 class="section-title">Replay</h2>
             <div class="music-grid">
               <div class="card" onclick="openAlbum('Monish\'s Replay', 'Your Top Songs', 'url(https://images.unsplash.com/photo-1619983081563-430f63602796?w=500&q=80)')">
-                <div class="art" style="background: url('https://images.unsplash.com/photo-1619983081563-430f63602796?w=500&q=80');"></div>
+                <div class="art" style="background: url('https://images.unsplash.com/photo-1619983081563-430f63602796?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div>
                 <div class="title">Monish's Replay</div>
                 <div class="subtitle">Top Songs & Artists</div>
               </div>
@@ -404,12 +504,22 @@ body {
           </section>
 
           <section class="music-section">
+            <h2 class="section-title">Top Picks <span>See All</span></h2>
+            <div class="music-grid">
+              <div class="card" onclick="openAlbum('Today\'s Hits', 'Pop', 'linear-gradient(45deg, #ff2d55, #ff5e62)', '')"><div class="art" style="background: linear-gradient(45deg, #ff2d55, #ff5e62);"></div><div class="title">Today's Hits</div><div class="subtitle">Pop</div></div>
+              <div class="card" onclick="openAlbum('Chill Station', 'Chill', 'linear-gradient(45deg, #4facfe, #00f2fe)', '')"><div class="art" style="background: linear-gradient(45deg, #4facfe, #00f2fe);"></div><div class="title">Chill Station</div><div class="subtitle">Chill</div></div>
+              <div class="card" onclick="openAlbum('Acoustic Hits', 'Acoustic', 'linear-gradient(45deg, #f6d365, #fda085)', '')"><div class="art" style="background: linear-gradient(45deg, #f6d365, #fda085);"></div><div class="title">Acoustic Hits</div><div class="subtitle">Acoustic</div></div>
+              <div class="card" onclick="openAlbum('Focus', 'Spatial Audio', 'linear-gradient(45deg, #43e97b, #38f9d7)', '')"><div class="art" style="background: linear-gradient(45deg, #43e97b, #38f9d7);"></div><div class="title">Focus</div><div class="subtitle">Instrumental</div></div>
+            </div>
+          </section>
+
+          <section class="music-section">
             <h2 class="section-title">Recently Played <span>See All</span></h2>
             <div class="music-grid">
-              <div class="card" onclick="openAlbum('After Hours', 'The Weeknd', 'url(https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80');"></div><div class="title">After Hours</div><div class="subtitle">The Weeknd</div></div>
-              <div class="card" onclick="openAlbum('Future Nostalgia', 'Dua Lipa', 'url(https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80');"></div><div class="title">Future Nostalgia</div><div class="subtitle">Dua Lipa</div></div>
-              <div class="card" onclick="openAlbum('1989', 'Taylor Swift', 'url(https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=500&q=80');"></div><div class="title">1989</div><div class="subtitle">Taylor Swift</div></div>
-              <div class="card" onclick="openAlbum('Happier Than Ever', 'Billie Eilish', 'url(https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80');"></div><div class="title">Happier Than Ever</div><div class="subtitle">Billie Eilish</div></div>
+              <div class="card" onclick="openAlbum('After Hours', 'The Weeknd', 'url(https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">After Hours</div><div class="subtitle">The Weeknd</div></div>
+              <div class="card" onclick="openAlbum('Future Nostalgia', 'Dua Lipa', 'url(https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Future Nostalgia</div><div class="subtitle">Dua Lipa</div></div>
+              <div class="card" onclick="openAlbum('1989', 'Taylor Swift', 'url(https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">1989</div><div class="subtitle">Taylor Swift</div></div>
+              <div class="card" onclick="openAlbum('Happier Than Ever', 'Billie Eilish', 'url(https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Happier Than Ever</div><div class="subtitle">Billie Eilish</div></div>
             </div>
           </section>
 
@@ -427,10 +537,10 @@ body {
           <section class="music-section">
             <h2 class="section-title">New Releases</h2>
             <div class="music-grid">
-              <div class="card" onclick="openAlbum('Views', 'Drake', 'url(https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80');"></div><div class="title">Views</div><div class="subtitle">Drake</div></div>
-              <div class="card" onclick="openAlbum('Astroworld', 'Travis Scott', 'url(https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80');"></div><div class="title">Astroworld</div><div class="subtitle">Travis Scott</div></div>
-              <div class="card" onclick="openAlbum('DAMN.', 'Kendrick Lamar', 'url(https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80');"></div><div class="title">DAMN.</div><div class="subtitle">Kendrick Lamar</div></div>
-              <div class="card" onclick="openAlbum('Sweetener', 'Ariana Grande', 'url(https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80'); filter: hue-rotate(90deg);"></div><div class="title">Sweetener</div><div class="subtitle">Ariana Grande</div></div>
+              <div class="card" onclick="openAlbum('Views', 'Drake', 'url(https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Views</div><div class="subtitle">Drake</div></div>
+              <div class="card" onclick="openAlbum('Astroworld', 'Travis Scott', 'url(https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Astroworld</div><div class="subtitle">Travis Scott</div></div>
+              <div class="card" onclick="openAlbum('DAMN.', 'Kendrick Lamar', 'url(https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">DAMN.</div><div class="subtitle">Kendrick Lamar</div></div>
+              <div class="card" onclick="openAlbum('Sweetener', 'Ariana Grande', 'url(https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80'); filter: hue-rotate(90deg); background-size: cover !important; background-position: center !important;"></div><div class="title">Sweetener</div><div class="subtitle">Ariana Grande</div></div>
             </div>
           </section>
         </div>
@@ -439,36 +549,21 @@ body {
           <section class="music-section">
             <h2 class="section-title">Featured Stations</h2>
             <div class="music-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
-              <div class="card" onclick="openAlbum('Apple Music 1', 'Live Radio', 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)', '📻')"><div class="art" style="aspect-ratio: 16/9; background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);">📻</div><div class="title">Apple Music 1</div><div class="subtitle">The new music that matters.</div></div>
-              <div class="card" onclick="openAlbum('Apple Music Hits', 'Live Radio', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', '🎙️')"><div class="art" style="aspect-ratio: 16/9; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🎙️</div><div class="title">Apple Music Hits</div><div class="subtitle">Songs you know and love.</div></div>
-            </div>
-          </section>
-        </div>
-
-        <div id="albums" class="page-view">
-          <section class="music-section">
-            <h2 class="section-title">Saved Albums</h2>
-            <div class="music-grid" id="realistic-albums-grid">
-              <div class="card" onclick="openAlbum('After Hours', 'The Weeknd', 'url(https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80');"></div><div class="title">After Hours</div><div class="subtitle">The Weeknd</div></div>
-              <div class="card" onclick="openAlbum('Future Nostalgia', 'Dua Lipa', 'url(https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80');"></div><div class="title">Future Nostalgia</div><div class="subtitle">Dua Lipa</div></div>
-              <div class="card" onclick="openAlbum('1989', 'Taylor Swift', 'url(https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=500&q=80');"></div><div class="title">1989</div><div class="subtitle">Taylor Swift</div></div>
-              <div class="card" onclick="openAlbum('Views', 'Drake', 'url(https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80');"></div><div class="title">Views</div><div class="subtitle">Drake</div></div>
-              <div class="card" onclick="openAlbum('Happier Than Ever', 'Billie Eilish', 'url(https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80');"></div><div class="title">Happier Than Ever</div><div class="subtitle">Billie Eilish</div></div>
-              <div class="card" onclick="openAlbum('Divide', 'Ed Sheeran', 'url(https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&q=80');"></div><div class="title">Divide</div><div class="subtitle">Ed Sheeran</div></div>
-              <div class="card" onclick="openAlbum('Astroworld', 'Travis Scott', 'url(https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80');"></div><div class="title">Astroworld</div><div class="subtitle">Travis Scott</div></div>
-              <div class="card" onclick="openAlbum('DAMN.', 'Kendrick Lamar', 'url(https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80');"></div><div class="title">DAMN.</div><div class="subtitle">Kendrick Lamar</div></div>
+              <div class="card" onclick="openAlbum('Music Radio 1', 'Live Radio', 'linear-gradient(135deg, #ff0844 0%, #ffb199 100%)', '📻')"><div class="art" style="aspect-ratio: 16/9; background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);">📻</div><div class="title">Music Radio 1</div><div class="subtitle">The new music that matters.</div></div>
+              <div class="card" onclick="openAlbum('Music Radio Hits', 'Live Radio', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', '🎙️')"><div class="art" style="aspect-ratio: 16/9; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🎙️</div><div class="title">Music Radio Hits</div><div class="subtitle">Songs you know and love.</div></div>
+              <div class="card" onclick="openAlbum('Music Country', 'Live Radio', 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)', '🎸')"><div class="art" style="aspect-ratio: 16/9; background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);">🎸</div><div class="title">Music Country</div><div class="subtitle">Where country lives.</div></div>
             </div>
           </section>
         </div>
 
         <div id="playlists" class="page-view">
           <section class="music-section">
-            <h2 class="section-title">Downloaded Playlists</h2>
+            <h2 class="section-title">Your Custom Playlists</h2>
             <div class="music-grid">
-              <div class="card" onclick="openAlbum('Late Night Drive', 'Made by You', 'linear-gradient(45deg, #434343, #000000)', '🚘')"><div class="art" style="background: linear-gradient(45deg, #434343, #000000);">🚘</div><div class="title">Late Night Drive</div><div class="subtitle">Downloaded</div></div>
-              <div class="card" onclick="openAlbum('Gym Pump', 'High Energy', 'linear-gradient(45deg, #ff9a9e, #fecfef)', '🏋️')"><div class="art" style="background: linear-gradient(45deg, #ff9a9e, #fecfef);">🏋️</div><div class="title">Gym Pump</div><div class="subtitle">Downloaded</div></div>
-              <div class="card" onclick="openAlbum('Rainy Day Mix', 'Chill', 'linear-gradient(45deg, #a1c4fd, #c2e9fb)', '🌧️')"><div class="art" style="background: linear-gradient(45deg, #a1c4fd, #c2e9fb);">🌧️</div><div class="title">Rainy Day Mix</div><div class="subtitle">Downloaded</div></div>
-              <div class="card" onclick="openAlbum('Coding Session', 'Lo-Fi', 'linear-gradient(45deg, #13547a, #80d0c7)', '💻')"><div class="art" style="background: linear-gradient(45deg, #13547a, #80d0c7);">💻</div><div class="title">Coding Session</div><div class="subtitle">Downloaded</div></div>
+              <div class="card" onclick="openAlbum('Late Night Drive', 'Made by You', 'linear-gradient(45deg, #434343, #000000)', '🚘')"><div class="art" style="background: linear-gradient(45deg, #434343, #000000);">🚘</div><div class="title">Late Night Drive</div><div class="subtitle">Made by You</div></div>
+              <div class="card" onclick="openAlbum('Gym Pump', 'High Energy', 'linear-gradient(45deg, #ff9a9e, #fecfef)', '🏋️')"><div class="art" style="background: linear-gradient(45deg, #ff9a9e, #fecfef);">🏋️</div><div class="title">Gym Pump</div><div class="subtitle">High Energy</div></div>
+              <div class="card" onclick="openAlbum('Rainy Day Mix', 'Chill', 'linear-gradient(45deg, #a1c4fd, #c2e9fb)', '🌧️')"><div class="art" style="background: linear-gradient(45deg, #a1c4fd, #c2e9fb);">🌧️</div><div class="title">Rainy Day Mix</div><div class="subtitle">Chill</div></div>
+              <div class="card" onclick="openAlbum('Coding Session', 'Lo-Fi', 'linear-gradient(45deg, #13547a, #80d0c7)', '💻')"><div class="art" style="background: linear-gradient(45deg, #13547a, #80d0c7);">💻</div><div class="title">Coding Session</div><div class="subtitle">Lo-Fi</div></div>
             </div>
           </section>
         </div>
@@ -477,21 +572,37 @@ body {
           <section class="music-section">
             <h2 class="section-title">Your Library Artists</h2>
             <div class="music-grid">
-              <div class="card" onclick="openAlbum('The Weeknd', 'Artist', '#ff2d55', 'W')"><div class="art artist-art" style="background: #ff2d55;">W</div><div class="title" style="text-align: center;">The Weeknd</div></div>
-              <div class="card" onclick="openAlbum('Taylor Swift', 'Artist', '#fa709a', 'T')"><div class="art artist-art" style="background: #fa709a;">T</div><div class="title" style="text-align: center;">Taylor Swift</div></div>
-              <div class="card" onclick="openAlbum('Drake', 'Artist', '#f6d365', 'Dr')"><div class="art artist-art" style="background: #f6d365;">Dr</div><div class="title" style="text-align: center;">Drake</div></div>
-              <div class="card" onclick="openAlbum('Dua Lipa', 'Artist', '#4facfe', 'D')"><div class="art artist-art" style="background: #4facfe;">D</div><div class="title" style="text-align: center;">Dua Lipa</div></div>
-              <div class="card" onclick="openAlbum('Kendrick Lamar', 'Artist', '#a18cd1', 'K')"><div class="art artist-art" style="background: #a18cd1;">K</div><div class="title" style="text-align: center;">Kendrick Lamar</div></div>
-              <div class="card" onclick="openAlbum('Travis Scott', 'Artist', '#30cfd0', 'TS')"><div class="art artist-art" style="background: #30cfd0;">TS</div><div class="title" style="text-align: center;">Travis Scott</div></div>
-              <div class="card" onclick="openAlbum('Billie Eilish', 'Artist', '#43e97b', 'B')"><div class="art artist-art" style="background: #43e97b;">B</div><div class="title" style="text-align: center;">Billie Eilish</div></div>
-              <div class="card" onclick="openAlbum('Ariana Grande', 'Artist', '#ff9a9e', 'A')"><div class="art artist-art" style="background: #ff9a9e;">A</div><div class="title" style="text-align: center;">Ariana Grande</div></div>
-              <div class="card" onclick="openAlbum('Ed Sheeran', 'Artist', '#fccb90', 'E')"><div class="art artist-art" style="background: #fccb90;">E</div><div class="title" style="text-align: center;">Ed Sheeran</div></div>
-              <div class="card" onclick="openAlbum('Post Malone', 'Artist', '#12d8fa', 'P')"><div class="art artist-art" style="background: #12d8fa;">P</div><div class="title" style="text-align: center;">Post Malone</div></div>
+              <div class="card" onclick="openAlbum('The Weeknd', 'Artist', 'url(https://i.scdn.co/image/ab6761610000e5ebc9c8c5e4b7f9d37e6b37f7b2)')"><div class="art artist-art" style="background: url('https://i.scdn.co/image/ab6761610000e5ebc9c8c5e4b7f9d37e6b37f7b2'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">The Weeknd</div></div>
+              <div class="card" onclick="openAlbum('Taylor Swift', 'Artist', 'url(https://i.scdn.co/image/ab6761610000e5ebf9a3e9b6c7f8d0f3e7b8d5a4)')"><div class="art artist-art" style="background: url('https://i.scdn.co/image/ab6761610000e5ebf9a3e9b6c7f8d0f3e7b8d5a4'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Taylor Swift</div></div>
+              <div class="card" onclick="openAlbum('Drake', 'Artist', 'url(https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9)')"><div class="art artist-art" style="background: url('https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Drake</div></div>
+              <div class="card" onclick="openAlbum('Dua Lipa', 'Artist', 'url(https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80)')"><div class="art artist-art" style="background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Dua Lipa</div></div>
+              <div class="card" onclick="openAlbum('Kendrick Lamar', 'Artist', 'url(https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&q=80)')"><div class="art artist-art" style="background: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Kendrick Lamar</div></div>
+              <div class="card" onclick="openAlbum('Travis Scott', 'Artist', 'url(https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80)')"><div class="art artist-art" style="background: url('https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Travis Scott</div></div>
+              <div class="card" onclick="openAlbum('Billie Eilish', 'Artist', 'url(https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80)')"><div class="art artist-art" style="background: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Billie Eilish</div></div>
+              <div class="card" onclick="openAlbum('Ariana Grande', 'Artist', 'url(https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&q=80)')"><div class="art artist-art" style="background: url('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Ariana Grande</div></div>
+              <div class="card" onclick="openAlbum('Ed Sheeran', 'Artist', 'url(https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=500&q=80)')"><div class="art artist-art" style="background: url('https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Ed Sheeran</div></div>
+              <div class="card" onclick="openAlbum('Post Malone', 'Artist', 'url(https://images.unsplash.com/photo-1520409364224-63400afe26e5?w=500&q=80)')"><div class="art artist-art" style="background: url('https://images.unsplash.com/photo-1520409364224-63400afe26e5?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title" style="text-align: center;">Post Malone</div></div>
             </div>
           </section>
         </div>
 
-        <div id="genres" class="page-view">
+        <div id="albums" class="page-view">
+          <section class="music-section">
+            <h2 class="section-title">Saved Albums</h2>
+            <div class="music-grid" id="realistic-albums-grid">
+              <div class="card" onclick="openAlbum('After Hours', 'The Weeknd', 'url(https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">After Hours</div><div class="subtitle">The Weeknd</div></div>
+              <div class="card" onclick="openAlbum('Future Nostalgia', 'Dua Lipa', 'url(https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Future Nostalgia</div><div class="subtitle">Dua Lipa</div></div>
+              <div class="card" onclick="openAlbum('1989', 'Taylor Swift', 'url(https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">1989</div><div class="subtitle">Taylor Swift</div></div>
+              <div class="card" onclick="openAlbum('Views', 'Drake', 'url(https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1493225457124-a1a2a5f5f92b?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Views</div><div class="subtitle">Drake</div></div>
+              <div class="card" onclick="openAlbum('Happier Than Ever', 'Billie Eilish', 'url(https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Happier Than Ever</div><div class="subtitle">Billie Eilish</div></div>
+              <div class="card" onclick="openAlbum('Divide', 'Ed Sheeran', 'url(https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Divide</div><div class="subtitle">Ed Sheeran</div></div>
+              <div class="card" onclick="openAlbum('Astroworld', 'Travis Scott', 'url(https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">Astroworld</div><div class="subtitle">Travis Scott</div></div>
+              <div class="card" onclick="openAlbum('DAMN.', 'Kendrick Lamar', 'url(https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80)')"><div class="art" style="background: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80'); background-size: cover !important; background-position: center !important;"></div><div class="title">DAMN.</div><div class="subtitle">Kendrick Lamar</div></div>
+            </div>
+          </section>
+        </div>
+
+        <div id="genres-lib" class="page-view">
           <section class="music-section">
             <h2 class="section-title">Browse by Genre</h2>
             <div class="music-grid">
@@ -501,6 +612,27 @@ body {
               <div class="card" onclick="openAlbum('Rock', 'Genre', 'linear-gradient(45deg, #4facfe, #00f2fe)', '🎸')"><div class="art" style="background: linear-gradient(45deg, #4facfe, #00f2fe);">🎸</div><div class="title">Rock</div></div>
             </div>
           </section>
+        </div>
+
+        <div id="songs" class="page-view">
+          <h2 class="section-title">Songs</h2>
+          <div class="tracklist-container" id="library-songs-list" style="padding: 0;"></div>
+          <p style="color:#aaa; padding: 20px 0;">Your saved songs will appear here.</p>
+        </div>
+
+        <div id="music-videos" class="page-view">
+          <h2 class="section-title">Music Videos</h2>
+          <p style="color:#aaa">Music videos library.</p>
+        </div>
+
+        <div id="downloaded" class="page-view">
+          <h2 class="section-title">Downloaded</h2>
+          <p style="color:#aaa">Offline downloads.</p>
+        </div>
+
+        <div id="recently-added" class="page-view">
+          <h2 class="section-title">Recently Added</h2>
+          <p style="color:#aaa">Recently added music.</p>
         </div>
 
         <div id="search-view" class="page-view">
@@ -520,32 +652,40 @@ body {
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg> Back
           </div>
           
-          <div class="detail-header-container">
+          <div class="detail-header-container" id="dynamic-header">
             <div class="detail-bg-blur" id="detail-bg-blur"></div>
-            
             <div class="detail-content-front">
               <div class="detail-art" id="detail-art"></div>
               <div class="detail-text">
                 <h1 id="detail-title">Album Name</h1>
                 <p id="detail-artist">Artist Name</p>
-                <div class="detail-meta">Lossless • High-Res Audio</div>
+                <div class="detail-meta" id="detail-meta-text">Premium Music • High-Res Lossless</div>
                 <div class="action-buttons">
-                  <button class="play-btn-large" onclick="playTrack(0)">
+                  <button class="play-btn-large" onclick="playQueue(0)">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="white"><path d="M8 5v14l11-7z"/></svg> Play
                   </button>
-                  <button class="shuffle-btn">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+                  <button class="shuffle-btn" onclick="toggleShuffle(); playQueue(0);">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg> Shuffle
                   </button>
                 </div>
               </div>
             </div>
           </div>
-
-          <div class="tracklist-container" id="tracklist-container">
-            </div>
+          <div class="tracklist-container" id="tracklist-container"></div>
         </div>
       </div>
     </main>
+
+    <div class="queue-panel" id="queue-panel">
+      <div class="queue-header">Up Next</div>
+      <div class="queue-list" id="queue-list">
+        </div>
+    </div>
+
+    <div class="context-menu" id="context-menu">
+      <div class="context-item" onclick="addTrackToQueue()">Play Next</div>
+      <div class="context-item" onclick="addTrackToPlaylist()">Add to Playlist...</div>
+    </div>
 
     <footer class="player-bar" id="mini-player-bar">
       <div class="now-playing">
@@ -558,11 +698,11 @@ body {
       
       <div class="player-center">
         <div class="player-controls">
-          <button class="control-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></button>
+          <button class="control-btn" id="repeat-btn" onclick="toggleRepeat()"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg></button>
           <button class="control-btn" onclick="prevSong()"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
           <button class="control-btn play-btn" id="play-pause-btn" onclick="togglePlay()"><svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
           <button class="control-btn" onclick="nextSong()"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
-          <button class="control-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg></button>
+          <button class="control-btn" id="shuffle-btn" onclick="toggleShuffle()"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></button>
         </div>
         <div class="progress-wrapper">
           <span id="current-time">0:00</span>
@@ -574,8 +714,9 @@ body {
       </div>
 
       <div class="volume-control">
+        <button class="control-btn" onclick="toggleQueue()"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/></svg></button>
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-        <div class="vol-slider"><div class="vol-fill"></div></div>
+        <div class="vol-slider" id="vol-slider"><div class="vol-fill" id="vol-fill"></div></div>
       </div>
     </footer>
 
@@ -616,270 +757,201 @@ body {
         </div>
       </div>
 
-      <div class="player-right-panel" id="lyrics-container">
-        </div>
+      <div class="player-right-panel" id="lyrics-container"></div>
     </div>
   </div>
 
   <script>
-    // --- 1. Login Logic ---
-    function handleLogin(event) {
-      event.preventDefault(); 
-      const loginScreen = document.getElementById('loginScreen');
-      loginScreen.classList.add('hidden');
-      document.getElementById('main-scroll-area').scrollTop = 0;
-    }
-
-    // --- Settings Logic ---
-    function toggleSettings() {
-      const overlay = document.getElementById('settingsOverlay');
-      if (overlay.classList.contains('hidden')) {
-        overlay.classList.remove('hidden');
-      } else {
-        overlay.classList.add('hidden');
-      }
-    }
-    function closeSettings(event) {
-      document.getElementById('settingsOverlay').classList.add('hidden');
-    }
-
-    // --- Search Logic ---
-    const searchInput = document.querySelector('.search-box input');
-    searchInput.addEventListener('focus', () => {
-      switchPage('search-view', null);
-      document.getElementById('page-header-title').textContent = "Search";
-    });
-
-    // --- Navigation Logic ---
-    let previousPage = 'home';
-    const mainScrollArea = document.getElementById('main-scroll-area');
-
-    mainScrollArea.addEventListener('scroll', () => {
-      const header = document.getElementById('app-header');
-      if(mainScrollArea.scrollTop > 10) { header.style.borderBottom = '1px solid var(--border)'; } 
-      else { header.style.borderBottom = '1px solid transparent'; }
-    });
-
-    function switchPage(pageId, clickedElement) {
-      document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
-
-      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-      if(clickedElement) clickedElement.classList.add('active');
-
-      const titles = { 'home': 'Listen Now', 'browse': 'Browse', 'radio': 'Radio', 'playlists': 'Playlists', 'artists': 'Artists', 'albums': 'Albums', 'genres': 'Genres', 'search-view': 'Search'};
-      document.getElementById('page-header-title').textContent = titles[pageId];
-      
-      document.getElementById('app-header').style.display = 'flex';
-      mainScrollArea.scrollTop = 0;
-    }
-
-    // --- Master-Detail View Logic (Preserved & Enhanced for Artists) ---
-    function openAlbum(title, artist, bg, textIcon = '') {
-      const activePage = document.querySelector('.page-view.active');
-      if (activePage && activePage.id !== 'detail-view') {
-        previousPage = activePage.id;
-      }
-
-      document.getElementById('detail-title').textContent = title;
-      document.getElementById('detail-artist').textContent = artist;
-      
-      const detailArt = document.getElementById('detail-art');
-      const detailBlur = document.getElementById('detail-bg-blur');
-      
-      detailArt.style.background = bg;
-      detailBlur.style.background = bg;
-      detailArt.textContent = textIcon;
-
-      const tracklistContainer = document.getElementById('tracklist-container');
-      tracklistContainer.innerHTML = ''; 
-
-      // Check if we are opening an Artist Profile
-      if(artist === 'Artist' || artist.includes('Profile')) {
-          detailArt.style.borderRadius = '50%'; // Make it circular
-          
-          // Inject custom Artist Layout into the tracklist container
-          tracklistContainer.innerHTML = `
-            <div style="margin-bottom: 40px;">
-              <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Top Songs</h2>
-              ${playlist.slice(0,4).map((track, i) => `
-                <div class="track-row" onclick="playTrack(${i})">
-                  <div class="track-num">${i + 1}</div>
-                  <div class="track-info-list">
-                    <div class="track-title-list">${track.title}</div>
-                    <div class="track-artist-list">${title}</div>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-            <div>
-              <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Essential Albums</h2>
-              <div class="music-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">
-                <div class="card"><div class="art" style="background: ${bg}; opacity: 0.8;"></div><div class="title">Greatest Hits</div><div class="subtitle">Compilation</div></div>
-                <div class="card"><div class="art" style="background: ${bg}; opacity: 0.6;"></div><div class="title">Live Tour</div><div class="subtitle">Live Album</div></div>
-              </div>
-            </div>
-          `;
-      } else {
-          // Standard Album/Playlist Layout
-          detailArt.style.borderRadius = '12px';
-          
-          const extendedPlaylist = [
-            { title: "Intro / " + title, artist: artist, duration: "1:45" },
-            { title: "Main Theme", artist: artist, duration: "3:30" },
-            { title: "Lost in the Echo", artist: artist, duration: "4:12" },
-            { title: "Midnight Horizon", artist: artist, duration: "2:55" },
-            { title: "Neon Lights", artist: artist, duration: "3:40" },
-            { title: "Outro", artist: artist, duration: "2:10" }
-          ];
-
-          extendedPlaylist.forEach((track, index) => {
-            const trackHtml = `
-              <div class="track-row" onclick="playTrack(${index})">
-                <div class="track-num">${index + 1}</div>
-                <div class="track-info-list">
-                  <div class="track-title-list">${track.title}</div>
-                  <div class="track-artist-list">${track.artist}</div>
-                </div>
-                <div class="track-duration">${track.duration}</div>
-              </div>
-            `;
-            tracklistContainer.innerHTML += trackHtml;
-          });
-      }
-
-      document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
-      document.getElementById('detail-view').classList.add('active');
-      document.getElementById('app-header').style.display = 'none'; 
-      mainScrollArea.scrollTop = 0;
-    }
-
-    function goBack() {
-      document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
-      document.getElementById(previousPage).classList.add('active');
-      
-      const titles = { 'home': 'Listen Now', 'browse': 'Browse', 'radio': 'Radio', 'playlists': 'Playlists', 'artists': 'Artists', 'albums': 'Albums', 'genres': 'Genres', 'search-view': 'Search'};
-      document.getElementById('page-header-title').textContent = titles[previousPage] || 'Library';
-      document.getElementById('app-header').style.display = 'flex';
-    }
-
-    // --- Audio Player Logic (Realistic Data mapped to generic audio) ---
+    // --- Audio Data & State ---
     const audioPlayer = document.getElementById('main-audio-player');
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    const fullPlayPauseBtn = document.getElementById('full-play-pause-btn'); 
-    
-    // Uses real names but plays safe test mp3s
-    const playlist = [
-      { title: "Blinding Lights", artist: "The Weeknd", bg: "linear-gradient(45deg, #ff2d55, #ff5e62)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-      { title: "Levitating", artist: "Dua Lipa", bg: "linear-gradient(45deg, #4facfe, #00f2fe)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-      { title: "Anti-Hero", artist: "Billie Eilish", bg: "linear-gradient(45deg, #f6d365, #fda085)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-      { title: "Cruel Summer", artist: "Taylor Swift", bg: "linear-gradient(45deg, #43e97b, #38f9d7)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-      { title: "God's Plan", artist: "Drake", bg: "linear-gradient(45deg, #fa709a, #fee140)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" },
-      { title: "HUMBLE.", artist: "Kendrick Lamar", bg: "linear-gradient(45deg, #30cfd0, #330867)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" }
-    ];
-    
-    let currentTrackIndex = 0;
-    let isPlaying = false;
+    audioPlayer.volume = 0.8;
+    let isPlaying = false, isShuffle = false, isRepeat = false;
+    let activeQueue = [], queueIndex = 0, userPlaylists = [], currentContextTrack = null;
 
+    // Expanded Realistic Master Database
+    const masterDatabase = [
+      { id: 1, title: "Blinding Lights", artist: "The Weeknd", album: "After Hours", bg: "url(https://i.scdn.co/image/ab6761610000e5ebc9c8c5e4b7f9d37e6b37f7b2)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", duration: "3:20" },
+      { id: 2, title: "Levitating", artist: "Dua Lipa", album: "Future Nostalgia", bg: "url(https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", duration: "3:23" },
+      { id: 3, title: "Anti-Hero", artist: "Taylor Swift", album: "Midnights", bg: "url(https://i.scdn.co/image/ab6761610000e5ebf9a3e9b6c7f8d0f3e7b8d5a4)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", duration: "3:20" },
+      { id: 4, title: "God's Plan", artist: "Drake", album: "Scorpion", bg: "url(https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", duration: "3:18" },
+      { id: 5, title: "Bad Guy", artist: "Billie Eilish", album: "When We All Fall Asleep", bg: "url(https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=500&q=80)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", duration: "3:14" },
+      { id: 6, title: "HUMBLE.", artist: "Kendrick Lamar", album: "DAMN.", bg: "url(https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3", duration: "2:57" },
+      { id: 7, title: "Starboy", artist: "The Weeknd", album: "Starboy", bg: "url(https://i.scdn.co/image/ab6761610000e5ebc9c8c5e4b7f9d37e6b37f7b2)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3", duration: "3:50" },
+      { id: 8, title: "Save Your Tears", artist: "The Weeknd", album: "After Hours", bg: "url(https://i.scdn.co/image/ab6761610000e5ebc9c8c5e4b7f9d37e6b37f7b2)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3", duration: "3:35" },
+      { id: 9, title: "One Dance", artist: "Drake", album: "Views", bg: "url(https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3", duration: "2:54" },
+      { id: 10, title: "Blank Space", artist: "Taylor Swift", album: "1989", bg: "url(https://i.scdn.co/image/ab6761610000e5ebf9a3e9b6c7f8d0f3e7b8d5a4)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3", duration: "3:51" }
+    ];
+
+    const artistDB = {
+      'The Weeknd': { img: 'url(https://i.scdn.co/image/ab6761610000e5ebc9c8c5e4b7f9d37e6b37f7b2)', listeners: '110M Monthly Listeners' },
+      'Taylor Swift': { img: 'url(https://i.scdn.co/image/ab6761610000e5ebf9a3e9b6c7f8d0f3e7b8d5a4)', listeners: '105M Monthly Listeners' },
+      'Drake': { img: 'url(https://i.scdn.co/image/ab6761610000e5eb4293385d324db8558179afd9)', listeners: '85M Monthly Listeners' },
+      'Billie Eilish': { img: 'url(https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80)', listeners: '65M Monthly Listeners' },
+      'Kendrick Lamar': { img: 'url(https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&q=80)', listeners: '55M Monthly Listeners' },
+      'Ariana Grande': { img: 'url(https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&q=80)', listeners: '75M Monthly Listeners' },
+      'Ed Sheeran': { img: 'url(https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?w=500&q=80)', listeners: '80M Monthly Listeners' },
+      'Post Malone': { img: 'url(https://images.unsplash.com/photo-1520409364224-63400afe26e5?w=500&q=80)', listeners: '60M Monthly Listeners' },
+      'Travis Scott': { img: 'url(https://images.unsplash.com/photo-1533174000243-782806dd0c36?w=500&q=80)', listeners: '50M Monthly Listeners' },
+      'Dua Lipa': { img: 'url(https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80)', listeners: '70M Monthly Listeners' }
+    };
+
+    // Advanced Lyrics Sync Engine
+    const songLyrics = [
+      { t: 0, text: "🎵 (Instrumental Intro) 🎵" }, { t: 5, text: "Yeah..." },
+      { t: 8, text: "I've been tryna call" }, { t: 11, text: "I've been on my own for long enough" },
+      { t: 15, text: "Maybe you can show me how to love, maybe" }, { t: 20, text: "I'm going through withdrawals" },
+      { t: 23, text: "You don't even have to do too much" }, { t: 27, text: "You can turn me on with just a touch, baby" },
+      { t: 32, text: "I look around and Sin City's cold and empty (oh)" }, { t: 38, text: "No one's around to judge me (oh)" },
+      { t: 42, text: "I can't see clearly when you're gone" }, { t: 47, text: "I said, ooh, I'm blinded by the lights" },
+      { t: 53, text: "No, I can't sleep until I feel your touch" }
+    ];
+
+    // --- Color Extraction ---
+    function getDominantColor(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      return `hsl(${Math.abs(hash) % 360}, 60%, 20%)`;
+    }
+    function applyDynamicColor(bgString) {
+      const color = getDominantColor(bgString);
+      document.documentElement.style.setProperty('--dynamic-color', color);
+    }
+
+    // --- Queue & Player Control ---
     const playIcon = `<svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
     const pauseIcon = `<svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
     const fullPlayIcon = `<svg viewBox="0 0 24 24" width="64" height="64" fill="white"><path d="M8 5v14l11-7z"/></svg>`;
     const fullPauseIcon = `<svg viewBox="0 0 24 24" width="64" height="64" fill="white"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
 
-    function playTrack(index) {
-      currentTrackIndex = index;
-      const safeIndex = index % playlist.length; 
-      const track = playlist[safeIndex];
+    function playQueue(startIndex) {
+      if(activeQueue.length === 0) return;
+      queueIndex = startIndex;
+      if (isShuffle) queueIndex = Math.floor(Math.random() * activeQueue.length);
+      loadSong(activeQueue[queueIndex]);
+      renderQueue();
+    }
 
-      const customTitle = document.getElementById('detail-title').textContent;
-      const customArtist = document.getElementById('detail-artist').textContent;
-
-      document.getElementById('player-title').textContent = customTitle + " - Track " + (index + 1);
-      document.getElementById('player-artist').textContent = customArtist;
-      document.getElementById('player-art').style.background = document.getElementById('detail-art').style.background;
-
+    function loadSong(track) {
+      document.getElementById('player-title').textContent = track.title;
+      document.getElementById('player-artist').textContent = track.artist;
+      document.getElementById('player-art').style.background = track.bg;
+      
       const fullOverlay = document.getElementById('fullPlayerOverlay');
       if (!fullOverlay.classList.contains('hidden')) {
-          document.getElementById('full-player-title').textContent = customTitle + " - Track " + (index + 1);
-          document.getElementById('full-player-artist').textContent = customArtist;
-          document.getElementById('full-player-art').style.background = document.getElementById('detail-art').style.background;
-          document.getElementById('full-player-bg').style.background = document.getElementById('detail-art').style.background;
+          document.getElementById('full-player-title').textContent = track.title;
+          document.getElementById('full-player-artist').textContent = track.artist;
+          document.getElementById('full-player-art').style.background = track.bg;
+          document.getElementById('full-player-bg').style.background = track.bg;
       }
 
+      applyDynamicColor(track.bg);
       audioPlayer.src = track.src; 
       audioPlayer.play();
-
       isPlaying = true;
-      playPauseBtn.innerHTML = pauseIcon; 
-      fullPlayPauseBtn.innerHTML = fullPauseIcon;
-      
-      resetLyrics(); // Reset lyrics engine on new track
+      updatePlayIcons();
+      renderLyrics();
+      highlightActiveTrackRow();
     }
 
     function togglePlay() {
       if (!audioPlayer.src) return;
-      if (isPlaying) { 
-        audioPlayer.pause(); 
-        playPauseBtn.innerHTML = playIcon; 
-        fullPlayPauseBtn.innerHTML = fullPlayIcon;
-      } else { 
-        audioPlayer.play(); 
-        playPauseBtn.innerHTML = pauseIcon; 
-        fullPlayPauseBtn.innerHTML = fullPauseIcon;
-      }
+      if (isPlaying) audioPlayer.pause(); else audioPlayer.play();
       isPlaying = !isPlaying;
+      updatePlayIcons();
     }
 
-    function nextSong() { currentTrackIndex++; playTrack(currentTrackIndex); }
-    function prevSong() { currentTrackIndex--; if (currentTrackIndex < 0) currentTrackIndex = 0; playTrack(currentTrackIndex); }
+    function updatePlayIcons() {
+      playPauseBtn.innerHTML = isPlaying ? pauseIcon : playIcon;
+      fullPlayPauseBtn.innerHTML = isPlaying ? fullPauseIcon : fullPlayIcon;
+    }
 
-    // --- Progress & Apple Lyrics Sync ---
+    function nextSong() {
+      if(activeQueue.length === 0) return;
+      if (isShuffle) {
+        queueIndex = Math.floor(Math.random() * activeQueue.length);
+      } else {
+        queueIndex++;
+        if (queueIndex >= activeQueue.length) {
+          queueIndex = isRepeat ? 0 : activeQueue.length - 1;
+          if(!isRepeat && queueIndex === activeQueue.length - 1) { isPlaying = false; updatePlayIcons(); return; }
+        }
+      }
+      loadSong(activeQueue[queueIndex]);
+      renderQueue();
+    }
+
+    function prevSong() {
+      if(activeQueue.length === 0) return;
+      queueIndex--;
+      if (queueIndex < 0) queueIndex = activeQueue.length - 1; 
+      loadSong(activeQueue[queueIndex]);
+      renderQueue();
+    }
+
+    function toggleShuffle() {
+      isShuffle = !isShuffle;
+      document.getElementById('shuffle-btn').classList.toggle('active');
+    }
+
+    function toggleRepeat() {
+      isRepeat = !isRepeat;
+      document.getElementById('repeat-btn').classList.toggle('active');
+    }
+
+    // --- Volume Control Add/Fix ---
+    const volumeSlider = document.querySelector('.vol-slider');
+    volumeSlider.addEventListener("click", function(e){
+      const width = volumeSlider.clientWidth;
+      const percent = e.offsetX / width;
+      audioPlayer.volume = percent;
+      document.querySelector(".vol-fill").style.width = (percent * 100) + "%";
+    });
+
+    // --- Keyboard Controls Add/Fix ---
+    document.addEventListener("keydown", function(e){
+      // Don't trigger if user is typing in a search input
+      if(e.target.tagName === 'INPUT') return;
+      
+      if(e.code === "Space"){
+        e.preventDefault();
+        togglePlay();
+      }
+      if(e.code === "ArrowRight"){
+        nextSong();
+      }
+      if(e.code === "ArrowLeft"){
+        prevSong();
+      }
+    });
+
+    // --- Progress & Lyrics ---
     const progressFill = document.getElementById('progress-fill');
     const currentTimeEl = document.getElementById('current-time');
     const totalTimeEl = document.getElementById('total-time');
 
-    // Apple Music Style Scrolling Lyrics Data
-    const songLyrics = [
-      { t: 0, text: "🎵 (Instrumental Intro) 🎵" },
-      { t: 8, text: "I said, ooh, I'm blinded by the lights" },
-      { t: 14, text: "No, I can't sleep until I feel your touch" },
-      { t: 20, text: "I said, ooh, I'm drowning in the night" },
-      { t: 26, text: "Oh, when I'm like this, you're the one I trust" },
-      { t: 32, text: "Hey, hey, hey" },
-      { t: 40, text: "🎵 (Synth Wave) 🎵" },
-      { t: 55, text: "I'm running out of time" },
-      { t: 60, text: "Cause I can see the sun light up the sky" },
-      { t: 66, text: "So I hit the road in overdrive, baby, oh" }
-    ];
-
-    function resetLyrics() {
+    function renderLyrics() {
       const container = document.getElementById('lyrics-container');
       container.innerHTML = songLyrics.map((line, i) => `<div class="lyric-line" id="lyric-${i}">${line.text}</div>`).join('');
     }
-    resetLyrics(); // Initialize on load
 
     audioPlayer.addEventListener('timeupdate', (e) => {
       const { duration, currentTime } = e.srcElement;
       if (duration) {
-        const progressPercent = (currentTime / duration) * 100;
-        progressFill.style.width = `${progressPercent}%`;
+        const p = (currentTime / duration) * 100;
+        progressFill.style.width = `${p}%`;
         totalTimeEl.textContent = formatTime(duration);
-        
-        const fullProgressFill = document.getElementById('full-progress-fill');
-        if(fullProgressFill) fullProgressFill.style.width = `${progressPercent}%`;
-        const fullTotalEl = document.getElementById('full-total-time');
-        if(fullTotalEl) fullTotalEl.textContent = formatTime(duration);
+        const fpf = document.getElementById('full-progress-fill');
+        if(fpf) fpf.style.width = `${p}%`;
+        const ftt = document.getElementById('full-total-time');
+        if(ftt) ftt.textContent = formatTime(duration);
       }
       currentTimeEl.textContent = formatTime(currentTime);
-      const fullCurrentEl = document.getElementById('full-current-time');
-      if(fullCurrentEl) fullCurrentEl.textContent = formatTime(currentTime);
+      const fct = document.getElementById('full-current-time');
+      if(fct) fct.textContent = formatTime(currentTime);
 
-      // Trigger Lyric Scrolling
       if (!document.getElementById('fullPlayerOverlay').classList.contains('hidden')) {
          let activeIdx = -1;
-         for(let i=0; i<songLyrics.length; i++) {
-            if (currentTime >= songLyrics[i].t) activeIdx = i;
-         }
+         for(let i=0; i<songLyrics.length; i++) { if (currentTime >= songLyrics[i].t) activeIdx = i; }
          if (activeIdx !== -1) {
             document.querySelectorAll('.lyric-line').forEach(el => el.classList.remove('active'));
             const activeEl = document.getElementById(`lyric-${activeIdx}`);
@@ -895,14 +967,11 @@ body {
 
     function seekTrack(e) {
       const width = document.getElementById('progress-container').clientWidth;
-      const duration = audioPlayer.duration;
-      if(duration) { audioPlayer.currentTime = (e.offsetX / width) * duration; }
+      if(audioPlayer.duration) audioPlayer.currentTime = (e.offsetX / width) * audioPlayer.duration;
     }
-    
     function seekFullTrack(e) {
       const width = document.getElementById('full-progress-container').clientWidth;
-      const duration = audioPlayer.duration;
-      if(duration) { audioPlayer.currentTime = (e.offsetX / width) * duration; }
+      if(audioPlayer.duration) audioPlayer.currentTime = (e.offsetX / width) * audioPlayer.duration;
     }
 
     function formatTime(time) {
@@ -911,18 +980,272 @@ body {
       return `${min}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
-    // --- Full Player Overlay ---
+    function toggleQueue() { document.getElementById('queue-panel').classList.toggle('open'); }
+    function renderQueue() {
+      const list = document.getElementById('queue-list');
+      list.innerHTML = activeQueue.map((track, i) => `
+        <div class="queue-item ${i === queueIndex ? 'active' : ''}" onclick="playQueue(${i})">
+          <div class="queue-item-art" style="background: ${track.bg}"></div>
+          <div class="queue-item-info">
+            <div class="queue-item-title">${track.title}</div>
+            <div class="queue-item-artist">${track.artist}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- Search Engine Overlay & On-Page Filtering (Combined/Enhanced) ---
+    const searchInputEl = document.getElementById('master-search');
+    const searchResultsOverlay = document.getElementById('search-results-overlay');
+    const searchResultsList = document.getElementById('search-results-list');
+
+    searchInputEl.addEventListener('input', function(e) {
+      const query = this.value.toLowerCase();
+      
+      // 1. Filter the overlay database
+      if(query.length === 0) { 
+        searchResultsOverlay.classList.remove('active'); 
+      } else {
+        searchResultsOverlay.classList.add('active');
+        const filtered = masterDatabase.filter(t => t.title.toLowerCase().includes(query) || t.artist.toLowerCase().includes(query));
+        if(filtered.length === 0) {
+          searchResultsList.innerHTML = `<p style="padding:20px; color:gray;">No results found.</p>`;
+        } else {
+          activeQueue = filtered; 
+          searchResultsList.innerHTML = filtered.map((track, i) => `
+            <div class="track-row" onclick="playQueue(${i}); document.getElementById('search-results-overlay').classList.remove('active');">
+              <div class="track-info-list" style="flex-direction:row; align-items:center; gap:12px;">
+                <div style="width:40px; height:40px; border-radius:4px; background:${track.bg}; background-size:cover;"></div>
+                <div>
+                  <div class="track-title-list">${track.title}</div>
+                  <div class="track-artist-list">${track.artist}</div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 2. Filter the cards on the active page behind the overlay
+      document.querySelectorAll(".card").forEach(card => {
+        const title = card.querySelector(".title")?.textContent.toLowerCase();
+        const subtitle = card.querySelector(".subtitle")?.textContent.toLowerCase();
+        if((title && title.includes(query)) || (subtitle && subtitle.includes(query))){
+          card.style.display = "block";
+        }else{
+          card.style.display = "none";
+        }
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if(!e.target.closest('.search-box') && !e.target.closest('.search-overlay')) {
+        searchResultsOverlay.classList.remove('active');
+        // Reset card visibility when search closes
+        document.querySelectorAll(".card").forEach(c => c.style.display = "block");
+      }
+      if(!e.target.closest('.context-menu') && !e.target.closest('.track-options')) {
+        document.getElementById('context-menu').classList.remove('show');
+      }
+    });
+
+    // --- Playlist Creation ---
+    function createPlaylist() {
+      const name = prompt("Enter playlist name:");
+      if(name) {
+        userPlaylists.push({ name: name, tracks: [] });
+        renderUserPlaylists();
+      }
+    }
+    
+    function renderUserPlaylists() {
+      const ul = document.getElementById('sidebar-playlists');
+      let html = '';
+      userPlaylists.forEach(pl => {
+        html += `<li><a class="nav-link" onclick="openAlbum('${pl.name}', 'Playlist', '#1c1c1e', '')"><svg viewBox="0 0 24 24"><path d="M4 10h12v2H4zm0-4h16v2H4zm0 8h8v2H4zm10 0v6l5-3z"/></svg> ${pl.name}</a></li>`;
+      });
+      ul.innerHTML = html;
+    }
+
+    function showContext(e, trackIndex) {
+      e.stopPropagation();
+      currentContextTrack = activeQueue[trackIndex];
+      const menu = document.getElementById('context-menu');
+      menu.style.top = e.pageY + 'px';
+      menu.style.left = e.pageX + 'px';
+      menu.classList.add('show');
+    }
+
+    function addTrackToQueue() {
+      if(currentContextTrack) {
+        activeQueue.splice(queueIndex + 1, 0, currentContextTrack);
+        renderQueue();
+      }
+    }
+
+    function addTrackToPlaylist() {
+      if(userPlaylists.length === 0) { alert("Create a playlist first!"); return; }
+      userPlaylists[0].tracks.push(currentContextTrack);
+      alert("Added to " + userPlaylists[0].name);
+    }
+
+    // --- Navigation & Master-Detail ---
+    let previousPage = 'home';
+    const mainScrollArea = document.getElementById('main-scroll-area');
+
+    mainScrollArea.addEventListener('scroll', () => {
+      const header = document.getElementById('app-header');
+      if(mainScrollArea.scrollTop > 10) { header.style.borderBottom = '1px solid var(--border)'; } 
+      else { header.style.borderBottom = '1px solid transparent'; }
+    });
+
+    function switchPage(pageId, clickedElement) {
+      document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+
+      if(clickedElement) {
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        clickedElement.classList.add('active');
+      }
+
+      const titles = { 'home': 'Listen Now', 'browse': 'Browse', 'radio': 'Radio', 'playlists': 'Playlists', 'artists': 'Artists', 'albums': 'Albums', 'genres-lib': 'Genres', 'songs': 'Songs', 'downloaded': 'Downloaded', 'recently-added': 'Recently Added', 'music-videos': 'Music Videos', 'compilations': 'Compilations'};
+      document.getElementById('page-header-title').textContent = titles[pageId] || "Library";
+      
+      document.getElementById('app-header').style.display = 'flex';
+      mainScrollArea.scrollTop = 0;
+
+      if(pageId === 'songs') populateLibrarySongs();
+    }
+
+    function populateLibrarySongs() {
+      activeQueue = masterDatabase; 
+      const list = document.getElementById('library-songs-list');
+      list.innerHTML = masterDatabase.map((track, i) => `
+        <div class="track-row" onclick="playQueue(${i})">
+          <div class="track-num">${i + 1}</div>
+          <div class="track-info-list" style="flex-direction:row; align-items:center; gap:16px;">
+             <div style="width:40px; height:40px; border-radius:4px; background:${track.bg}; background-size:cover;"></div>
+             <div><div class="track-title-list">${track.title}</div><div class="track-artist-list">${track.artist} • ${track.album}</div></div>
+          </div>
+          <div class="track-duration">${track.duration}</div>
+          <div class="track-options" onclick="showContext(event, ${i})">•••</div>
+        </div>
+      `).join('');
+    }
+
+    function openAlbum(title, artist, bg, textIcon = '') {
+      const activePage = document.querySelector('.page-view.active');
+      if (activePage && activePage.id !== 'detail-view') previousPage = activePage.id;
+
+      applyDynamicColor(bg);
+      document.getElementById('detail-title').textContent = title;
+      document.getElementById('detail-artist').textContent = artist;
+      
+      const detailArt = document.getElementById('detail-art');
+      const detailBlur = document.getElementById('detail-bg-blur');
+      
+      detailArt.style.background = bg;
+      detailBlur.style.background = bg;
+      detailArt.textContent = textIcon;
+
+      const tracklistContainer = document.getElementById('tracklist-container');
+      
+      if(artist === 'Artist' || artist.includes('Profile')) {
+          detailArt.style.borderRadius = '50%'; 
+          document.getElementById('dynamic-header').classList.add('artist-banner-view');
+          
+          let artistData = artistDB[title];
+          document.getElementById('detail-meta-text').textContent = artistData ? artistData.listeners : 'Artist Profile';
+
+          activeQueue = masterDatabase.filter(t => t.artist === title);
+          if(activeQueue.length === 0) activeQueue = masterDatabase.slice(0,5);
+
+          tracklistContainer.innerHTML = `
+            <div style="margin-bottom: 40px;">
+              <h2 class="section-title">Top Songs</h2>
+              ${activeQueue.map((track, i) => `
+                <div class="track-row" onclick="playQueue(${i})">
+                  <div class="track-num">${i + 1}</div>
+                  <div class="track-info-list" style="flex-direction:row; align-items:center; gap:16px;">
+                    <div style="width:40px; height:40px; border-radius:4px; background:${track.bg}; background-size:cover;"></div>
+                    <div><div class="track-title-list">${track.title}</div><div class="track-artist-list">${track.album}</div></div>
+                  </div>
+                  <div class="track-duration">${track.duration}</div>
+                  <div class="track-options" onclick="showContext(event, ${i})">•••</div>
+                </div>
+              `).join('')}
+            </div>
+            <div style="margin-bottom: 40px;">
+              <h2 class="section-title">Albums</h2>
+              <div class="horizontal-scroll-grid">
+                <div class="card" onclick="openAlbum('Greatest Hits', '${title}', '${bg}')"><div class="art" style="background: ${bg}; filter: saturate(1.5);"></div><div class="title">Greatest Hits</div><div class="subtitle">Compilation</div></div>
+                <div class="card" onclick="openAlbum('Live Tour', '${title}', '${bg}')"><div class="art" style="background: ${bg}; filter: grayscale(0.5);"></div><div class="title">Live Tour</div><div class="subtitle">Live Album</div></div>
+              </div>
+            </div>
+          `;
+      } else {
+          detailArt.style.borderRadius = '12px';
+          document.getElementById('dynamic-header').classList.remove('artist-banner-view');
+          document.getElementById('detail-meta-text').textContent = "Premium Music • High-Res Lossless";
+          
+          activeQueue = JSON.parse(JSON.stringify(masterDatabase)); 
+          activeQueue.forEach(t => t.album = title); 
+
+          tracklistContainer.innerHTML = activeQueue.map((track, i) => `
+            <div class="track-row" onclick="playQueue(${i})">
+              <div class="track-num">${i + 1}</div>
+              <div class="track-info-list">
+                <div class="track-title-list">${track.title}</div>
+                <div class="track-artist-list">${track.artist}</div>
+              </div>
+              <div class="track-duration">${track.duration}</div>
+              <div class="track-options" onclick="showContext(event, ${i})">•••</div>
+            </div>
+          `).join('');
+      }
+
+      document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
+      document.getElementById('detail-view').classList.add('active');
+      document.getElementById('app-header').style.display = 'none'; 
+      mainScrollArea.scrollTop = 0;
+    }
+
+    function goBack() {
+      document.querySelectorAll('.page-view').forEach(page => page.classList.remove('active'));
+      document.getElementById(previousPage).classList.add('active');
+      document.getElementById('page-header-title').textContent = document.querySelector('.sidebar a.active').textContent.trim();
+      document.getElementById('app-header').style.display = 'flex';
+      document.documentElement.style.setProperty('--dynamic-color', '#1c1c1e'); 
+    }
+
+    function highlightActiveTrackRow() {
+      document.querySelectorAll('.track-row').forEach((row, i) => {
+        if(i === queueIndex) row.classList.add('playing');
+        else row.classList.remove('playing');
+      });
+    }
+
+    // --- Drag & Open Full Player Gesture ---
     const miniPlayerBar = document.getElementById('mini-player-bar');
     const fullPlayerOverlay = document.getElementById('fullPlayerOverlay');
+    let startY = 0, isDragging = false;
 
-    miniPlayerBar.addEventListener('click', (e) => {
+    miniPlayerBar.addEventListener('mousedown', (e) => {
       if(e.target.closest('.player-center') || e.target.closest('.volume-control')) return;
-      openFullPlayer();
+      isDragging = true;
+      startY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if(!isDragging) return;
+      isDragging = false;
+      if(startY - e.clientY > 30 || Math.abs(startY - e.clientY) < 5) {
+        openFullPlayer();
+      }
     });
 
     function openFullPlayer() {
       if (!audioPlayer.src) return; 
-      
       document.getElementById('full-player-title').textContent = document.getElementById('player-title').textContent;
       document.getElementById('full-player-artist').textContent = document.getElementById('player-artist').textContent;
       
@@ -933,16 +1256,23 @@ body {
       fullPlayPauseBtn.innerHTML = isPlaying ? fullPauseIcon : fullPlayIcon;
       fullPlayerOverlay.classList.remove('hidden');
       
-      // Auto-scroll lyrics to current spot on open
       setTimeout(() => {
         const activeLyric = document.querySelector('.lyric-line.active');
         if(activeLyric) activeLyric.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
     }
 
-    function closeFullPlayer() {
-      fullPlayerOverlay.classList.add('hidden');
+    function closeFullPlayer() { fullPlayerOverlay.classList.add('hidden'); }
+    
+    // Auth logic
+    function handleLogin(event) {
+      event.preventDefault(); 
+      const loginScreen = document.getElementById('loginScreen');
+      loginScreen.classList.add('hidden');
+      document.getElementById('main-scroll-area').scrollTop = 0;
     }
+    function toggleSettings() { document.getElementById('settingsOverlay').classList.toggle('hidden'); }
+    function closeSettings() { document.getElementById('settingsOverlay').classList.add('hidden'); }
   </script>
 </body>
 </html>
