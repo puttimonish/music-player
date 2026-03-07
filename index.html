@@ -1273,6 +1273,217 @@ body {
     }
     function toggleSettings() { document.getElementById('settingsOverlay').classList.toggle('hidden'); }
     function closeSettings() { document.getElementById('settingsOverlay').classList.add('hidden'); }
+/* =========================================
+   QUEUE PERSISTENCE SYSTEM
+   Saves and restores queue using localStorage
+========================================= */
+
+// Save queue to browser storage
+function saveQueue(){
+  localStorage.setItem("musicQueue", JSON.stringify({
+    queue: activeQueue,
+    index: queueIndex
+  }));
+}
+
+// Load queue when page opens
+function loadQueue(){
+  const data = localStorage.getItem("musicQueue");
+  if(!data) return;
+
+  const parsed = JSON.parse(data);
+
+  activeQueue = parsed.queue || [];
+  queueIndex = parsed.index || 0;
+
+  renderQueue();
+}
+
+// Clear entire queue
+function clearQueue(){
+  activeQueue = [];
+  queueIndex = 0;
+
+  renderQueue();
+  saveQueue();
+}
+
+// Save queue whenever a new song loads
+const originalLoadSong = loadSong;
+loadSong = function(track){
+  originalLoadSong(track);
+  saveQueue();
+};
+
+// Load queue when page starts
+window.addEventListener("load", loadQueue);
+/* =========================================
+   REAL MUSIC APP FEATURES
+========================================= */
+
+/* -------- Volume Memory -------- */
+
+const savedVolume = localStorage.getItem("musicVolume");
+
+if(savedVolume){
+  audioPlayer.volume = parseFloat(savedVolume);
+  document.querySelector(".vol-fill").style.width = (audioPlayer.volume * 100) + "%";
+}
+
+audioPlayer.addEventListener("volumechange", ()=>{
+  localStorage.setItem("musicVolume", audioPlayer.volume);
+});
+
+
+/* -------- Recently Played -------- */
+
+function saveRecentlyPlayed(track){
+
+  let history = JSON.parse(localStorage.getItem("recentTracks") || "[]");
+
+  history = history.filter(t => t.id !== track.id);
+
+  history.unshift(track);
+
+  if(history.length > 10) history.pop();
+
+  localStorage.setItem("recentTracks", JSON.stringify(history));
+
+}
+
+
+/* Hook into existing loadSong */
+
+const oldLoader = loadSong;
+
+loadSong = function(track){
+
+  oldLoader(track);
+
+  saveRecentlyPlayed(track);
+
+  updateMediaSession(track);
+
+};
+
+
+/* -------- Favorites System -------- */
+
+function toggleFavorite(track){
+
+  let fav = JSON.parse(localStorage.getItem("favoriteTracks") || "[]");
+
+  const exists = fav.find(t => t.id === track.id);
+
+  if(exists){
+    fav = fav.filter(t => t.id !== track.id);
+  }else{
+    fav.push(track);
+  }
+
+  localStorage.setItem("favoriteTracks", JSON.stringify(fav));
+
+}
+
+function getFavorites(){
+  return JSON.parse(localStorage.getItem("favoriteTracks") || "[]");
+}
+
+
+/* -------- Lock Screen Media Controls -------- */
+
+function updateMediaSession(track){
+
+  if(!("mediaSession" in navigator)) return;
+
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: track.title,
+    artist: track.artist,
+    album: track.album,
+    artwork: [
+      {
+        src: track.bg.replace("url(","").replace(")",""),
+        sizes: "512x512",
+        type: "image/png"
+      }
+    ]
+  });
+
+  navigator.mediaSession.setActionHandler("play", togglePlay);
+  navigator.mediaSession.setActionHandler("pause", togglePlay);
+  navigator.mediaSession.setActionHandler("nexttrack", nextSong);
+  navigator.mediaSession.setActionHandler("previoustrack", prevSong);
+
+}
+
+
+/* -------- Keyboard Shortcuts -------- */
+
+document.addEventListener("keydown",(e)=>{
+
+  if(e.target.tagName === "INPUT") return;
+
+  if(e.key === "f"){
+    const track = activeQueue[queueIndex];
+    if(track) toggleFavorite(track);
+  }
+
+  if(e.key === "n"){
+    nextSong();
+  }
+
+  if(e.key === "p"){
+    prevSong();
+  }
+
+});
+/* ===============================
+   AUDIO VISUALIZER
+=============================== */
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioCtx.createAnalyser();
+const source = audioCtx.createMediaElementSource(audioPlayer);
+
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+analyser.fftSize = 256;
+
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+
+const canvas = document.getElementById("visualizer");
+const ctx = canvas.getContext("2d");
+
+function drawVisualizer(){
+
+  requestAnimationFrame(drawVisualizer);
+
+  analyser.getByteFrequencyData(dataArray);
+
+  ctx.fillStyle = "black";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  const barWidth = (canvas.width / bufferLength) * 2;
+
+  let x = 0;
+
+  for(let i=0;i<bufferLength;i++){
+
+    const barHeight = dataArray[i] / 2;
+
+    ctx.fillStyle = "rgb(255,60,80)";
+    ctx.fillRect(x,canvas.height-barHeight,barWidth,barHeight);
+
+    x += barWidth + 1;
+
+  }
+
+}
+
+drawVisualizer();
+
   </script>
 </body>
 </html>
