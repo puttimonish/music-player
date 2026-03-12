@@ -782,6 +782,33 @@ body {
       { id: 10, title: "Blank Space", artist: "Taylor Swift", album: "1989", bg: "url(https://i.scdn.co/image/ab6761610000e5ebf9a3e9b6c7f8d0f3e7b8d5a4)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3", duration: "3:51" }
     ];
 
+// ===============================
+// BUBBLE SORT ALGORITHM
+// ===============================
+function bubbleSortSongs(arr){
+
+  let n = arr.length;
+
+  for(let i = 0; i < n - 1; i++){
+
+    for(let j = 0; j < n - i - 1; j++){
+
+      if(arr[j].title > arr[j + 1].title){
+
+        let temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+
+      }
+
+    }
+
+  }
+
+}
+
+// Apply sorting to masterDatabase
+bubbleSortSongs(masterDatabase);
     const artistDB = {
       'The Weeknd': { img: 'url(https://i.scdn.co/image/ab6761610000e5ebc9c8c5e4b7f9d37e6b37f7b2)', listeners: '110M Monthly Listeners' },
       'Taylor Swift': { img: 'url(https://i.scdn.co/image/ab6761610000e5ebf9a3e9b6c7f8d0f3e7b8d5a4)', listeners: '105M Monthly Listeners' },
