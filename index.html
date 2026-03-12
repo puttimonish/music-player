@@ -767,7 +767,54 @@ body {
     audioPlayer.volume = 0.8;
     let isPlaying = false, isShuffle = false, isRepeat = false;
     let activeQueue = [], queueIndex = 0, userPlaylists = [], currentContextTrack = null;
+// ---------------------------
+// LINKED LIST IMPLEMENTATION (DSA Demonstration)
+// ---------------------------
 
+class Node {
+  constructor(data){
+    this.data = data;
+    this.next = null;
+  }
+}
+
+class LinkedList {
+  constructor(){
+    this.head = null;
+  }
+
+  insert(data){
+    const newNode = new Node(data);
+
+    if(!this.head){
+      this.head = newNode;
+      return;
+    }
+
+    let current = this.head;
+
+    while(current.next){
+      current = current.next;
+    }
+
+    current.next = newNode;
+  }
+
+  display(){
+    let current = this.head;
+
+    while(current){
+      console.log(current.data);
+      current = current.next;
+    }
+  }
+}
+
+// Example Linked List for Playlist
+const playlistLL = new LinkedList();
+playlistLL.insert("Blinding Lights");
+playlistLL.insert("Levitating");
+playlistLL.insert("Anti-Hero");
     // Expanded Realistic Master Database
     const masterDatabase = [
       { id: 1, title: "Blinding Lights", artist: "The Weeknd", album: "After Hours", bg: "url(https://i.scdn.co/image/ab6761610000e5ebc9c8c5e4b7f9d37e6b37f7b2)", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", duration: "3:20" },
